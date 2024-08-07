@@ -1,0 +1,57 @@
+<div class="d-flex justify-content-center align-items-center vh-100">
+  <div class="custom-modal-content p-4">
+    <div
+      class="modal-header flex-column align-items-center p-0 position-relative user-icon-wrapper"
+    >
+      <div class="user-icon-circle">
+        <i class="bi bi-person-fill icon-size"></i>
+      </div>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="userForm">
+        <div class="mb-3">
+          <label for="name" class="form-label d-flex justify-content-start">
+            Name
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            id="name"
+            formControlName="name"
+            placeholder="Name"
+            [ngModel]="this.isEdit ? this.name : ''"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="job" class="form-label d-flex justify-content-start">
+            Job title
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            id="job"
+            formControlName="job"
+            placeholder="Job title..."
+          />
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer d-flex justify-content-around w-100 pb-3">
+      <button
+        type="button"
+        class="btn btn-outline-secondary"
+        (click)="cancel()"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        [disabled]="!userForm.valid"
+        (click)="addUpdateUser()"
+      >
+        {{ isEdit ? "Save" : "Add" }}
+      </button>
+    </div>
+  </div>
+</div>

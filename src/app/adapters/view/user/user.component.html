@@ -1,0 +1,125 @@
+<app-subheader
+  (addUser)="openAddUserModal()"
+  [title]="'Users List'"
+></app-subheader>
+<!-- Main Content -->
+<div class="container mt-3 d-flex" style="max-width: 1170px">
+  <!-- User List -->
+  <div class="user-list bg-white p-3 shadow-sm rounded flex-grow-1">
+    <div class="d-flex justify-content-between py-2 px-3">
+      <span>User</span>
+      <span class="action-title">Actions</span>
+    </div>
+    @for(user of (users$ | async); track user.id){
+    <div
+      class="d-flex align-items-center border-top py-2 list-user"
+      [class.selected]="user === selectedUser"
+    >
+      <img
+        [src]="user.avatar"
+        alt="{{ user.first_name }}"
+        class="rounded-circle me-3"
+        width="57"
+        height="57"
+      />
+      <div class="flex-grow-1">
+        <h5 class="m-0 user-name">{{ user.first_name }}</h5>
+      </div>
+      <div class="d-flex" *ngIf="selectedUser !== user">
+        <button
+          class="btn btn-outline-secondary btn-sm me-2 action-btn"
+          (click)="openAddUserModal(user)"
+        >
+          <img
+            src="assets/icons/edit-pen.svg"
+            alt="New User Icon"
+            class="icon"
+          />
+        </button>
+        <button
+          class="btn btn-outline-secondary btn-sm me-2 action-btn"
+          (click)="openDeleteModal(user)"
+        >
+          <img
+            src="assets/icons/icon-trash.svg"
+            alt="Trash Icon"
+            class="icon"
+          />
+        </button>
+      </div>
+      <div class="d-flex">
+        <button
+          class="btn btn-outline-secondary btn-sm chevron-btn"
+          [ngClass]="{ selected: selectedUser === user }"
+          (click)="toggleUserDetail(user)"
+        >
+          <i
+            class="bi"
+            [ngClass]="{
+              'bi-chevron-right': selectedUser !== user,
+              'bi-chevron-left': selectedUser === user
+            }"
+          ></i>
+        </button>
+      </div>
+    </div>
+    } @if((loading$ | async)){
+    <div class="d-flex justify-content-center mt-3">
+      <div class="spinner-border" role="status"></div>
+    </div>
+    }
+  </div>
+
+  <!-- User Detail Card -->
+  @if(selectedUser) {
+  <div class="user-details card p-3 position-relative">
+    <button
+      class="btn-close position-absolute top-0 end-0 m-2"
+      (click)="closeCard()"
+    ></button>
+    <div class="d-flex justify-content-center align-items-center">
+      <img
+        [src]="selectedUser.avatar"
+        alt="{{ selectedUser.first_name }}"
+        class="rounded-circle card-avatar"
+        width="100"
+        height="100"
+      />
+    </div>
+    <h5 class="text-center mt-3">{{ selectedUser.first_name }}</h5>
+    <div class="d-flex justify-content-center action-wrapper">
+      <button
+        class="btn btn-primary"
+        style="width: 110px"
+        (click)="openAddUserModal(selectedUser)"
+      >
+        <img
+          src="assets/icons/pen-fill-icon.svg"
+          alt="New User Icon"
+          class="icon"
+        />
+        Edit
+      </button>
+      <button
+        class="btn btn-outline-secondary"
+        style="width: 110px"
+        (click)="openDeleteModal(selectedUser)"
+      >
+        <i class="bi bi-trash-fill"></i> Delete
+      </button>
+    </div>
+  </div>
+  }
+</div>
+
+<app-alert
+  [message]="successMessage$ | async"
+  type="success"
+  (cleanMessage)="clearSuccessMessage()"
+></app-alert>
+
+<app-alert
+  [message]="errorMessage$ | async"
+  type="error"
+  (cleanMessage)="clearErrorMessage()"
+></app-alert>

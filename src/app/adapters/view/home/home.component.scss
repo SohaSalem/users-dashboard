@@ -1,0 +1,10 @@
+.container-height {
+  height: 100vh;
+  background-color: #f0f0f0;
+}
+
+.right-panel {
+  padding: 16px;
+  background-color: #ffffff;
+  flex-grow: 1; /* Ensure the right panel takes up available space */
+}

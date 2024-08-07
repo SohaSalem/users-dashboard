@@ -1,0 +1,22 @@
+<div class="d-flex justify-content-center align-items-center vh-100">
+  <div class="modal-delete-dialog">
+    <div class="modal-delete-content">
+      <div class="modal-body text-center p-4">
+        <h5 class="mb-3 message-title">Are you sure you want to delete</h5>
+        <p class="fs-5 mb-4 user-name">{{ name }}</p>
+        <div class="d-flex justify-content-around gap-3">
+          <button
+            type="button"
+            class="btn btn-outline-primary px-5"
+            (click)="cancel()"
+          >
+            No
+          </button>
+          <button type="button" class="btn btn-primary px-5" (click)="delete()">
+            Yes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
