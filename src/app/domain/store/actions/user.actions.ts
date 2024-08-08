@@ -13,7 +13,7 @@ export const loadUsers = createAction(
 
 export const usersLoaded = createAction(
   "[Load Users Effect] Users Loaded",
-  props<{ users: any; page: number }>()
+  props<{ users: PaginatedUserResponse; page: number }>()
 );
 
 export const loadUsersFailure = createAction(
