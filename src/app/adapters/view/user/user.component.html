@@ -1,0 +1,69 @@
+<app-subheader
+  (addUser)="openAddUserModal()"
+  [title]="'Users List'"
+></app-subheader>
+
+<!-- Main Content -->
+<div class="container mt-3" style="max-width: 1170px">
+  <div class="search-container mb-3">
+    <input
+      type="text"
+      class="form-control search-input"
+      placeholder="Search by ID"
+      [(ngModel)]="searchTerm"
+      (input)="onSearch()"
+    />
+  </div>
+
+  <div class="d-flex">
+    <!-- User List -->
+    <div class="user-list bg-white p-3 shadow-sm rounded flex-grow-1">
+      <div class="d-flex justify-content-between py-2 px-3">
+        <span>Users</span>
+      </div>
+      @if (!(loading$ | async)) {
+        @if (filteredUsers.length > 0) {
+          @for (user of filteredUsers; track user.id) {
+            <div
+              class="d-flex align-items-center border-top py-2 list-user"
+              (click)="userDetail(user.id)"
+              style="cursor: pointer"
+            >
+              <img
+                [src]="user.avatar"
+                alt="{{ user.first_name }}"
+                class="rounded-circle me-3"
+                width="57"
+                height="57"
+              />
+              <div class="flex-grow-1">
+                <h5 class="m-0 user-name">{{ user.first_name }}</h5>
+              </div>
+            </div>
+          }
+        } @else {
+          <div class="d-flex justify-content-center mt-3">
+            <p>No users found.</p>
+          </div>
+        }
+      }
+      @if (loading$ | async) {
+        <div class="d-flex justify-content-center mt-3">
+          <div class="spinner-border" role="status"></div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<app-alert
+  [message]="successMessage$ | async"
+  type="success"
+  (cleanMessage)="clearSuccessMessage()"
+></app-alert>
+
+<app-alert
+  [message]="errorMessage$ | async"
+  type="error"
+  (cleanMessage)="clearErrorMessage()"
+></app-alert>

@@ -1,0 +1,24 @@
+<div *ngIf="user$ | async as user">
+  <app-subheader
+    [title]="user?.first_name ?? 'User'"
+    [newUser]="false"
+  ></app-subheader>
+  <div class="user-details card p-3 position-relative">
+    <button
+      class="btn btn-outline-secondary position-absolute top-0 start-0 m-2"
+      (click)="goBack()"
+    >
+      <i class="bi bi-arrow-left"></i> Back
+    </button>
+    <div class="d-flex justify-content-center align-items-center">
+      <img
+        [src]="user.avatar"
+        alt="{{ user.first_name }}"
+        class="rounded-circle card-avatar"
+        width="100"
+        height="100"
+      />
+    </div>
+    <h5 class="text-center mt-3">{{ user.first_name }}</h5>
+  </div>
+</div>

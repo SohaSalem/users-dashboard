@@ -1,0 +1,19 @@
+<div
+  *ngIf="message"
+  class="alert"
+  [ngClass]="{
+    'alert-success': type === 'success',
+    'alert-danger': type === 'error'
+  }"
+  role="alert"
+  [ngStyle]="{ 'bottom.px': message ? '20' : '0' }"
+  [@fadeInOut]="message ? 'visible' : 'hidden'"
+>
+  {{ message }}
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="clearMessage()"
+  ></button>
+</div>

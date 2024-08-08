@@ -1,0 +1,49 @@
+.user-list {
+  flex: 1;
+  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+
+  span {
+    color: #7f8c8d;
+    font-size: 12px;
+  }
+}
+
+.list-user {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid #e0e0e0;
+  padding: 10px;
+  height: 85px;
+
+  &:hover {
+    background-color: rgba(142, 68, 173, 0.05);
+  }
+}
+
+.user-name {
+  color: #34495e;
+  font-size: 17px;
+  letter-spacing: 0;
+  line-height: 18px;
+}
+
+.list-user .rounded-circle {
+  border: 2px solid transparent;
+  height: 64px;
+  width: 64px;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  width: 200px; /* Adjust width as needed */
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+  transition: border-color 0.3s;
+}
