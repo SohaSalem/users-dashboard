@@ -1,19 +1,19 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
-import { UserService } from '../../domain/outbound/user.service';
+import { Injectable } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { Observable, map } from "rxjs";
+import { UserService } from "../../domain/outbound/user.service";
 import {
   PaginatedUserResponse,
   User,
   UserCreateRequest,
   UserCreateResponse,
-} from '../../domain/models/user.model';
+} from "../../domain/models/user.model";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class RestUserService implements UserService {
-  private baseUrl = 'https://reqres.in/api/users';
+  private baseUrl = "https://reqres.in/api/users";
 
   constructor(private http: HttpClient) {}
 
@@ -36,16 +36,5 @@ export class RestUserService implements UserService {
   // An API endpoint for creating a user. (User creation view)
   createUser(user: UserCreateRequest): Observable<any> {
     return this.http.post<UserCreateResponse>(this.baseUrl, user);
-  }
-  // An API endpoint for deleting a user. (User removal modal)
-  deleteUser(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
-  }
-  // An API endpoint for updating a user. (User updating view)
-  updateUser(userId: number, user: UserCreateRequest): Observable<any> {
-    return this.http.patch<UserCreateResponse>(
-      `${this.baseUrl}/${userId}`,
-      user
-    );
   }
 }

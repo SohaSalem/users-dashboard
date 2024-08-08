@@ -1,6 +1,6 @@
-import { createSelector } from '@ngrx/store';
-import { AppState } from '../reducers/app.reducer';
-import { UserState } from '../reducers/user.reducer';
+import { createSelector } from "@ngrx/store";
+import { AppState } from "../reducers/app.reducer";
+import { UserState } from "../reducers/user.reducer";
 
 export const selectUserState = (state: AppState) => state.users;
 
@@ -26,9 +26,7 @@ export const selectLoading = createSelector(
   (state: UserState) => state.loading
 );
 
-export const selectSelectedUser = createSelector(
-  selectUserState,
-  (userState: UserState) => {
-    return userState.selectedUser;
-  }
-);
+export const selectUserById = (id: number) =>
+  createSelector(selectUserState, (userState: UserState) => {
+    return userState.users.find((user) => user.id === id);
+  });

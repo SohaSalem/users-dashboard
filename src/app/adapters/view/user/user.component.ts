@@ -13,15 +13,20 @@ import {
   loadUsers,
   selectUser,
 } from "../../../domain/store/actions/user.actions";
-import { Observable, debounceTime, fromEvent } from "rxjs";
+import {
+  Observable,
+  combineLatest,
+  debounceTime,
+  fromEvent,
+  map,
+  startWith,
+} from "rxjs";
 import { HttpClientModule } from "@angular/common/http";
 import {
   selectLoading,
-  selectSelectedUser,
   selectUsers,
 } from "../../../domain/store/selectors/user.selectors";
 import { AppState } from "../../../domain/store/reducers/app.reducer";
-import { UserDeleteDialogComponent } from "./user-delete-dialog/user-delete-dialog.component";
 import { User } from "../../../domain/models/user.model";
 import { SubheaderComponent } from "../subheader/subheader.component";
 import { AlertComponent } from "../alert/alert.component";
@@ -33,6 +38,8 @@ import {
   clearErrorMessage,
   clearSuccessMessage,
 } from "../../../domain/store/actions/message.actions";
+import { FormsModule } from "@angular/forms";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "app-user",
@@ -40,10 +47,10 @@ import {
   imports: [
     CommonModule,
     UserAddEditDialogComponent,
-    UserDeleteDialogComponent,
     HttpClientModule,
     SubheaderComponent,
     AlertComponent,
+    FormsModule,
   ],
   templateUrl: "./user.component.html",
   styleUrl: "./user.component.scss",
@@ -56,19 +63,40 @@ export class UserComponent implements OnInit {
   errorMessage$?: Observable<string | null>;
 
   isLoading: boolean = false;
-
-  selectedUser: User | null = null;
   currentPage: number = 1;
+  filteredUsers: Partial<User>[] = [];
+  searchTerm: string = "";
 
-  constructor(private modalService: NgbModal, private store: Store<AppState>) {
+  constructor(
+    private modalService: NgbModal,
+    private store: Store<AppState>,
+    private router: Router
+  ) {
     this.loading$ = this.store.select(selectLoading);
   }
 
   ngOnInit(): void {
     this.store.dispatch(loadUsers({ page: this.currentPage }));
     this.users$ = this.store.select(selectUsers);
+    this.users$.subscribe((users) => {
+      this.filteredUsers = users;
+    });
     this.successMessage$ = this.store.select(selectSuccessMessage);
     this.errorMessage$ = this.store.select(selectErrorMessage);
+  }
+
+  onSearch() {
+    if (this.searchTerm) {
+      this.users$.subscribe((users) => {
+        this.filteredUsers = users.filter((user) =>
+          user.id?.toString().includes(this.searchTerm)
+        );
+      });
+    } else {
+      this.users$.subscribe((users) => {
+        this.filteredUsers = users;
+      });
+    }
   }
 
   openAddUserModal(user?: Partial<User>): void {
@@ -82,38 +110,14 @@ export class UserComponent implements OnInit {
         this.store.dispatch(selectUser({ user }));
       }
     }
-
-    modalRef.result.then(
-      (result) => {
-        this.closeCard();
-      },
-      (reason) => {}
-    );
   }
 
-  openDeleteModal(user: Partial<User>): void {
-    if (user.id !== undefined) {
-      // Proceed with the operation
-      const modalRef = this.modalService.open(UserDeleteDialogComponent);
-      modalRef.componentInstance.user = user;
-
-      modalRef.result.then(
-        (result) => {},
-        (reason) => {
-          if (reason === "delete") {
-            this.selectedUser = null;
-          }
-        }
-      );
+  userDetail(userId: number | undefined): void {
+    if (userId !== undefined) {
+      this.router.navigate(["/user", userId]);
+    } else {
+      console.error("User ID is undefined");
     }
-  }
-
-  toggleUserDetail(user: any) {
-    this.selectedUser = this.selectedUser === user ? null : user;
-  }
-
-  closeCard() {
-    this.selectedUser = null;
   }
 
   @HostListener("window:scroll", ["$event"])

@@ -1,8 +1,8 @@
-import { createReducer, on } from '@ngrx/store';
-import { UserActions } from '../actions/action-types';
-import { User } from '../../models/user.model';
+import { createReducer, on } from "@ngrx/store";
+import { UserActions } from "../actions/action-types";
+import { User } from "../../models/user.model";
 
-export const userFeatureKey = 'users';
+export const userFeatureKey = "users";
 
 export interface UserState {
   users: Partial<User>[];
@@ -59,7 +59,7 @@ export const userReducer = createReducer(
     const newUser = {
       ...action.user,
       first_name: action.user.name, // Map `name` to `first_name`
-      avatar: 'https://via.placeholder.com/250', // Add default avatar as its not provided when add new user
+      avatar: "https://via.placeholder.com/250", // Add default avatar as its not provided when add new user
     };
     return {
       ...state,
@@ -72,48 +72,6 @@ export const userReducer = createReducer(
     loading: false,
   })),
 
-  on(UserActions.updateUser, (state) => ({
-    ...state,
-    loading: true,
-  })),
-
-  on(UserActions.userUpdated, (state, action) => ({
-    ...state,
-    users: state.users.map((user) =>
-      user.id === action.id
-        ? {
-            ...user,
-            first_name: action.user.name ?? user.first_name, // Map `name` to `first_name`
-            ...action.user,
-          }
-        : user
-    ),
-    loading: false,
-  })),
-  on(UserActions.userUpdatedFailure, (state, action) => ({
-    ...state,
-    loading: false,
-  })),
-
-  on(UserActions.userDeleted, (state, action) => ({
-    ...state,
-    users: [
-      ...(state.users?.filter((user) => user.id !== action.userId) ?? []),
-    ],
-    loading: false,
-  })),
-  on(UserActions.userDeletedFailure, (state, action) => ({
-    ...state,
-    loading: false,
-  })),
-
-  on(UserActions.selectUser, (state, action) => {
-    return {
-      ...state,
-      selectedUser: action.user,
-    };
-  }),
-
   on(UserActions.noMoreUsers, (state) => {
     return state;
   }),
@@ -121,5 +79,25 @@ export const userReducer = createReducer(
   on(UserActions.setLoading, (state, { loading }) => ({
     ...state,
     loading,
+  })),
+
+  on(UserActions.loadUserByIdSuccess, (state, action) => {
+    // Check if the user is already in the state
+    const userExists = state.users.some((user) => user.id === action.user.id);
+
+    return {
+      ...state,
+      users: userExists
+        ? state.users.map((user) =>
+            user.id === action.user.id ? action.user : user
+          )
+        : [...state.users, action.user], // Add the user if not already present
+      selectedUser: action.user,
+      loading: false,
+    };
+  }),
+  on(UserActions.loadUserByIdFailure, (state) => ({
+    ...state,
+    loading: false,
   }))
 );

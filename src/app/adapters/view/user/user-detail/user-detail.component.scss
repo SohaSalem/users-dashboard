@@ -1,0 +1,36 @@
+.action-btn {
+  border: 1px solid #8e44ad;
+  border-radius: 3px;
+}
+
+.user-details h5 {
+  letter-spacing: 0;
+  line-height: 29px;
+  padding-bottom: 2rem;
+}
+
+.user-details .btn {
+  border-radius: 20px;
+  width: 110px;
+}
+
+.user-details .rounded-circle {
+  border-radius: 50%;
+  height: 127px;
+  width: 127px;
+}
+
+.user-details .btn-outline-secondary {
+  box-sizing: border-box;
+  height: 40px;
+  width: 110px;
+  border: 1px solid #8e44ad;
+  border-radius: 20px;
+  background-color: #f5f5f5;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+  color: #8e44ad;
+}
+
+.action-wrapper {
+  gap: 1rem;
+}

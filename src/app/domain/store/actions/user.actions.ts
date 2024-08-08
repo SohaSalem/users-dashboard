@@ -53,39 +53,24 @@ export const userAddedFailure = createAction(
   props<{ error: string }>()
 );
 
-export const updateUser = createAction(
-  "[User Edit Page] Update User",
-  props<{ user: UserCreateRequest }>()
-);
-
-export const userUpdated = createAction(
-  "[Update User Effect] User Updated",
-  props<{ user: Partial<UserCreateResponse>; id: number | undefined }>()
-);
-
-export const userUpdatedFailure = createAction(
-  "[Update User Effect] User Updated Failure",
-  props<{ error: string }>()
-);
-
-export const deleteUser = createAction(
-  "[User Page] Delete User",
-  props<{ userId: number | undefined }>()
-);
-
-export const userDeleted = createAction(
-  "[Delete User Effect] User Deleted",
-  props<{ userId: number | undefined }>()
-);
-
-export const userDeletedFailure = createAction(
-  "[Delete User Effect] User Deleted Failure",
-  props<{ error: string }>()
-);
-
 export const selectUser = createAction(
   "[User Page] Select User",
   props<{ user: Partial<User> }>()
+);
+
+export const loadUserById = createAction(
+  "[User] Load User By Id",
+  props<{ userId: number }>()
+);
+
+export const loadUserByIdSuccess = createAction(
+  "[User] Load User By Id Success",
+  props<{ user: Partial<User> }>()
+);
+
+export const loadUserByIdFailure = createAction(
+  "[User] Load User By Id Failure",
+  props<{ error: any }>()
 );
 
 export const noMoreUsers = createAction("[User List] No More Users");

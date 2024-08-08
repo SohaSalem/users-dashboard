@@ -8,11 +8,12 @@ import { UserActions } from "../actions/action-types";
 import { AppState } from "../reducers/app.reducer";
 import {
   selectPageNumber,
-  selectSelectedUser,
   selectTotalPages,
   selectUsers,
 } from "../selectors/user.selectors";
 import { setErrorMessage, setSuccessMessage } from "../actions/message.actions";
+
+const cache = new Map<string, any>();
 
 @Injectable()
 export class UserEffects {
@@ -22,15 +23,18 @@ export class UserEffects {
       withLatestFrom(this.store.select(selectUsers)),
       switchMap(([action, users]) => {
         const page = action.page;
-        console.log(users);
-        if (users && users.length > 0) {
-          console.log(users);
-          debugger;
-          return of(UserActions.usersLoaded({ users, page }));
+        const cacheKey = JSON.stringify(action);
+
+        if (cache.has(cacheKey)) {
+          const cachedResponse = cache.get(cacheKey);
+          return of(UserActions.usersLoaded({ users: cachedResponse, page }));
         } else {
           this.store.dispatch(UserActions.setLoading({ loading: true }));
           return this.userService.getUsers(page).pipe(
-            map((users) => UserActions.usersLoaded({ users, page })),
+            map((users) => {
+              cache.set(cacheKey, users);
+              return UserActions.usersLoaded({ users, page });
+            }),
             catchError((error) => of(UserActions.loadUsersFailure({ error })))
           );
         }
@@ -50,22 +54,54 @@ export class UserEffects {
           return of();
         }
 
-        this.store.dispatch(UserActions.setLoading({ loading: true }));
-        return this.userService.getUsers(pageNumber + 1).pipe(
-          map((response) => {
-            const { data: users, total_pages: totalPages } = response;
-            if (users.length > 0) {
-              // Set totalPages only on the first call or when it changes
-              if (pageNumber === 1) {
-                this.store.dispatch(UserActions.setUsersMeta({ totalPages }));
+        const cacheKey = `loadMoreUsers-${pageNumber + 1}`;
+
+        if (cache.has(cacheKey)) {
+          const cachedResponse = cache.get(cacheKey);
+          return of(UserActions.moreUsersLoaded({ users: cachedResponse }));
+        } else {
+          this.store.dispatch(UserActions.setLoading({ loading: true }));
+          return this.userService.getUsers(pageNumber + 1).pipe(
+            map((response) => {
+              const { data: users, total_pages: totalPages } = response;
+              cache.set(cacheKey, users);
+
+              if (users.length > 0) {
+                if (pageNumber === 1) {
+                  this.store.dispatch(UserActions.setUsersMeta({ totalPages }));
+                }
+                return UserActions.moreUsersLoaded({ users });
+              } else {
+                return UserActions.noMoreUsers();
               }
-              return UserActions.moreUsersLoaded({ users });
-            } else {
-              return UserActions.noMoreUsers();
-            }
-          }),
-          catchError((error) => of(UserActions.loadUsersFailure({ error })))
-        );
+            }),
+            catchError((error) => of(UserActions.loadUsersFailure({ error })))
+          );
+        }
+      })
+    )
+  );
+
+  loadUserById$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(UserActions.loadUserById),
+      switchMap((action) => {
+        const cacheKey = `user-${action.userId}`;
+
+        if (cache.has(cacheKey)) {
+          const cachedUser = cache.get(cacheKey);
+          return of(UserActions.loadUserByIdSuccess({ user: cachedUser }));
+        } else {
+          return this.userService.getUserById(action.userId).pipe(
+            map((user) => {
+              cache.set(cacheKey, user);
+              return UserActions.loadUserByIdSuccess({ user });
+            }),
+            catchError((error) =>
+              of(UserActions.loadUserByIdFailure({ error }))
+            )
+          );
+        }
       })
     )
   );
@@ -74,45 +110,9 @@ export class UserEffects {
     this.actions$.pipe(
       ofType(UserActions.addUser),
       switchMap((action) => {
-        return this.userService
-          .createUser({
-            ...action.user,
-          })
-          .pipe(
-            map((user) => UserActions.userAdded({ user })),
-            catchError((error) => of(UserActions.userAddedFailure({ error })))
-          );
-      })
-    )
-  );
-
-  editUser$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(UserActions.updateUser),
-      withLatestFrom(this.store.select(selectSelectedUser)),
-      switchMap(([action, selectedUser]) => {
-        return this.userService
-          .updateUser(selectedUser?.id || 0, action.user)
-          .pipe(
-            map((updatedUser: any) =>
-              UserActions.userUpdated({
-                user: updatedUser,
-                id: selectedUser?.id,
-              })
-            ),
-            catchError((error) => of(UserActions.userUpdatedFailure({ error })))
-          );
-      })
-    )
-  );
-
-  deleteUser$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(UserActions.deleteUser),
-      switchMap((action) => {
-        return this.userService.deleteUser(action.userId || 0).pipe(
-          map(() => UserActions.userDeleted({ userId: action.userId || 0 })),
-          catchError((error) => of(UserActions.userDeletedFailure({ error })))
+        return this.userService.createUser({ ...action.user }).pipe(
+          map((user) => UserActions.userAdded({ user })),
+          catchError((error) => of(UserActions.userAddedFailure({ error })))
         );
       })
     )
@@ -124,18 +124,6 @@ export class UserEffects {
       map(() => setSuccessMessage({ message: "User added successfully" }))
     )
   );
-  userDeleted$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(UserActions.userDeleted),
-      map(() => setSuccessMessage({ message: "User deleted successfully" }))
-    )
-  );
-  userUpdated$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(UserActions.userUpdated),
-      map(() => setSuccessMessage({ message: "User updated successfully" }))
-    )
-  );
 
   userAddedFailure$ = createEffect(() =>
     this.actions$.pipe(
@@ -143,23 +131,10 @@ export class UserEffects {
       map((action) => setErrorMessage({ message: action.error }))
     )
   );
-  userDeletedFailure$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(UserActions.userDeletedFailure),
-      map((action) => setErrorMessage({ message: action.error }))
-    )
-  );
-  userUpdatedFailure$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(UserActions.userUpdatedFailure),
-      map((action) => setErrorMessage({ message: action.error }))
-    )
-  );
 
   constructor(
     private actions$: Actions,
-    @Inject(USER_SERVICE)
-    private userService: UserService,
+    @Inject(USER_SERVICE) private userService: UserService,
     private store: Store<AppState>
   ) {}
 }

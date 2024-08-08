@@ -5,11 +5,12 @@
       <span class="me-2"><a href="#">Home</a> / <a href="#">Dashboard</a></span>
       <h2 class="m-0">{{ title }}</h2>
     </div>
-    <button
-      class="btn btn-primary add-new-button align-self-end"
-      (click)="openAddUserModal()"
-    >
-      <i class="bi bi-plus"></i> New User
-    </button>
+    @if (newUser) {
+      <div class="d-flex align-items-center">
+        <button class="btn btn-primary add-new-button" (click)="addUser.emit()">
+          <i class="bi bi-plus"></i> New User
+        </button>
+      </div>
+    }
   </div>
 </div>

@@ -25,17 +25,6 @@
     text-decoration: underline;
   }
 }
-
-.login-button {
-  height: 40px;
-  width: 112px;
-  border-radius: 20px;
-
-  span {
-    font-size: 15px;
-  }
-}
-
 @media (max-width: 768px) {
   .container-fluid {
     flex-direction: column;
@@ -50,9 +39,5 @@
       padding: 8px 0;
       margin-right: 0;
     }
-  }
-
-  .login-button {
-    margin-top: 16px;
   }
 }
